@@ -1,1 +1,0 @@
-<?php require __DIR__.'/bootstrap.php'; require_admin(); foreach(allowed_types() as $type){ $path=__DIR__.'/../content/'.$type.'.json'; if(file_exists($path)){ $data=json_decode(file_get_contents($path),true); if($data!==null) save_payload($type,$data); }} out(['ok'=>true,'message'=>'Imported content/*.json into MySQL content_store']);
