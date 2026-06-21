@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="mk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ФГСМ — Администрација</title>
+<script src="../app-config.js"></script>
+<style>
+:root{--bg:#08111f;--panel:#101d31;--panel2:#14243d;--text:#edf4ff;--muted:#9bb0cc;--brand:#4aa3ff;--ok:#36d399;--warn:#ffce5a;--bad:#ff6b6b;--border:rgba(255,255,255,.12)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:radial-gradient(circle at top left,#173964,#08111f 42%,#050913);color:var(--text)}
+header{padding:22px 28px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;gap:16px;align-items:center;background:rgba(8,17,31,.82);position:sticky;top:0;z-index:30;backdrop-filter:blur(16px)}
+h1{font-size:20px;margin:0}
+.wrap{display:grid;grid-template-columns:280px 1fr;min-height:calc(100vh - 78px)}
+aside{border-right:1px solid var(--border);padding:20px;background:rgba(7,14,25,.72)}
+main{padding:24px;max-width:1240px}
+.btn,button{border:0;border-radius:12px;padding:11px 14px;background:var(--brand);color:#fff;font-weight:700;cursor:pointer}
+.btn.secondary,button.secondary{background:#223551;color:var(--text)}
+button.danger{background:#742b35}
+button.small{padding:7px 10px;border-radius:9px;font-size:12px}
+.tabs button{display:block;width:100%;margin:0 0 8px;text-align:left;background:transparent;color:var(--muted);border:1px solid var(--border)}
+.tabs button.active{background:linear-gradient(135deg,#1d5d9e,#183b6a);color:#fff}
+.card{background:rgba(16,29,49,.86);border:1px solid var(--border);border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 20px 60px rgba(0,0,0,.22)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px}
+input,textarea,select{width:100%;border:1px solid var(--border);border-radius:12px;background:#081527;color:var(--text);padding:11px;font:inherit}
+textarea{min-height:90px}textarea.rich{min-height:150px;font-family:inherit}
+.muted{color:var(--muted)}.sm{font-size:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}.row.center{justify-content:center}.gap6{gap:6px}
+.hide{display:none!important}.status{font-size:13px}
+.login{max-width:440px;margin:12vh auto}
+.pill{font-size:12px;color:#bfe2ff;background:rgba(74,163,255,.15);border:1px solid rgba(74,163,255,.3);padding:5px 8px;border-radius:999px}
+.req{color:var(--bad)}
+/* chips & badges */
+.chip{display:inline-block;font-size:11px;font-weight:600;color:#bfe2ff;background:rgba(74,163,255,.13);border:1px solid rgba(74,163,255,.28);padding:3px 8px;border-radius:999px;white-space:nowrap}
+.chip.lic{color:#d6ffe9;background:rgba(54,211,153,.12);border-color:rgba(54,211,153,.3)}
+.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.badge.up{color:#0a2018;background:rgba(54,211,153,.92)}
+.badge.past{color:var(--muted);background:rgba(255,255,255,.08);border:1px solid var(--border)}
+.badge.live{color:#1b1402;background:var(--warn)}
+.linkbtn{display:inline-block;font-size:12px;font-weight:600;color:#bfe2ff;text-decoration:none;border:1px solid var(--border);border-radius:8px;padding:4px 9px;background:rgba(255,255,255,.04)}
+.linkbtn:hover{border-color:var(--brand)}
+/* toolbar / filters */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.toolbar select{width:auto;min-width:150px;padding:8px 10px}
+/* tables */
+.tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:14px;margin:0 0 16px}
+table.tbl{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+table.tbl th{text-align:left;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:11px 12px;background:rgba(255,255,255,.03);border-bottom:1px solid var(--border)}
+table.tbl td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.06);vertical-align:middle}
+table.tbl tbody tr:hover{background:rgba(74,163,255,.06)}
+table.tbl tr:last-child td{border-bottom:0}
+td.act{text-align:right;white-space:nowrap}
+.group-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;margin:18px 0 10px;color:#dbe9ff}
+.rowact{display:inline-flex;gap:6px;justify-content:flex-end}
+.thumb{width:46px;height:46px;border-radius:10px;object-fit:cover;background:#0c1a2e;border:1px solid var(--border)}
+.thumb.ph{display:inline-block}
+/* news cards */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.news-card{border:1px solid var(--border);border-radius:16px;overflow:hidden;background:rgba(255,255,255,.03);display:flex;flex-direction:column}
+.news-card.unpub{opacity:.55}
+.news-thumb{position:relative;aspect-ratio:16/9;background:#0c1a2e}
+.news-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.news-thumb .ph{width:100%;height:100%}
+.news-thumb .star,.gal-item .star{position:absolute;top:8px;right:8px;color:var(--warn);font-size:16px}
+.news-body{padding:13px;display:flex;flex-direction:column;gap:8px;flex:1}
+.news-meta{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.news-card h4{margin:0;font-size:15px;line-height:1.3}
+.news-card p{margin:0;font-size:13px;flex:1}
+.readmore{color:var(--brand);font-size:12px;font-weight:700}
+/* gallery */
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.gal-item{position:relative;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#0c1a2e}
+.gal-item.unpub{opacity:.55}
+.gal-item img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:zoom-in}
+.gal-item .ph{width:100%;aspect-ratio:1/1}
+.gal-item figcaption{padding:9px 11px;display:flex;flex-direction:column;gap:2px;font-size:12px}
+.gal-act{position:absolute;top:8px;left:8px;display:flex;gap:6px}
+/* profiles */
+.people-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.profile{border:1px solid var(--border);border-radius:16px;padding:18px;background:rgba(255,255,255,.03);text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+.profile.unpub{opacity:.55}
+.avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#1d5d9e,#183b6a);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#cfe6ff}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profile h4{margin:0;font-size:16px}
+.profile .role{font-size:13px;color:var(--muted)}
+.profile .bio{font-size:12px;text-align:center;max-height:78px;overflow:hidden}
+/* partners & clubs cards */
+.partner-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.partner{border:1px solid var(--border);border-radius:14px;padding:14px;background:rgba(255,255,255,.03);display:flex;flex-direction:column;gap:10px}
+.partner-logo{height:70px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;overflow:hidden;text-decoration:none;color:#0c1a2e;font-weight:800;padding:8px}
+.partner-logo img{max-width:100%;max-height:100%;object-fit:contain}
+/* social */
+.social-list{display:flex;flex-direction:column;gap:10px}
+.social-row{display:flex;align-items:center;gap:14px;border:1px solid var(--border);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.03)}
+.social-row.off{opacity:.5}
+.social-icon{width:42px;height:42px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;background:linear-gradient(135deg,#1d5d9e,#183b6a);text-transform:uppercase}
+.social-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.social-main a{font-size:12px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* simple list (pages) */
+.item{border:1px solid var(--border);border-radius:16px;padding:14px;background:rgba(255,255,255,.035);margin:10px 0}
+/* editor */
+.editor-grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+.field{display:flex;flex-direction:column}
+.field.wide{grid-column:1/-1}
+.fhelp{font-size:11px;color:var(--muted);margin-top:4px}
+.toggle{position:relative;display:inline-flex;align-items:center;width:48px;height:26px;cursor:pointer}
+.toggle input{position:absolute;opacity:0;width:0;height:0}
+.toggle span{position:absolute;inset:0;background:#223551;border:1px solid var(--border);border-radius:999px;transition:.15s}
+.toggle span:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.15s}
+.toggle input:checked + span{background:var(--ok)}
+.toggle input:checked + span:before{transform:translateX(22px)}
+.upl-row{display:flex;gap:8px}
+.uplbtn{flex:none;display:inline-flex;align-items:center}
+.thumb-prev{margin-top:8px}
+.thumb-prev img{max-height:90px;border-radius:10px;border:1px solid var(--border)}
+.editor-preview{position:sticky;top:96px;align-self:start;border:1px dashed var(--border);border-radius:16px;padding:14px;background:rgba(8,17,31,.5)}
+.prev-label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+details.adv{margin:14px 0}
+details.adv summary{cursor:pointer;color:var(--muted);font-size:13px}
+details.adv textarea{min-height:170px;font-family:Consolas,monospace;margin-top:8px}
+.settings-keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:12px}
+.skey{border:1px solid var(--border);border-radius:12px;padding:10px;background:rgba(255,255,255,.03);overflow:hidden}
+.skey pre{margin:6px 0 0;font-size:11px;white-space:pre-wrap;word-break:break-word}
+/* lightbox */
+.lb{position:fixed;inset:0;background:rgba(2,7,15,.92);display:flex;align-items:center;justify-content:center;z-index:100;cursor:zoom-out}
+.lb img{max-width:92vw;max-height:92vh;border-radius:10px}
+@media(max-width:980px){.editor-grid{grid-template-columns:1fr}.editor-preview{position:static}}
+@media(max-width:820px){.wrap{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--border)}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>ФГСМ Администрација</h1><div class="muted">Контрола на содржината — Netlify или Zemi</div></div>
+  <div class="row"><span id="mode" class="pill"></span><a class="btn secondary" href="../">Отвори веб</a><button id="logout" class="secondary hide">Одјава</button></div>
+</header>
+
+<section id="login" class="login card">
+  <h2>Најава</h2><p class="muted">Внеси ја администраторската лозинка.</p>
+  <label>Лозинка</label><input id="password" type="password" autocomplete="current-password">
+  <p><button id="loginBtn">Најави се</button></p><p id="loginMsg" class="status muted"></p>
+</section>
+
+<div id="app" class="wrap hide">
+  <aside>
+    <div class="tabs" id="tabs"></div>
+    <div class="card"><b>Прикачи датотека</b><p class="muted sm">Постави слика/PDF и копирај ја патеката во поле.</p>
+      <input id="file" type="file"><p><button id="uploadBtn" class="secondary">Прикачи</button></p>
+      <input id="uploadPath" readonly placeholder="/assets/uploads/..."></div>
+  </aside>
+  <main>
+    <div class="row between">
+      <div><h2 id="title"></h2><p id="hint" class="muted"></p></div>
+      <button id="newBtn">+ Нова ставка</button>
+    </div>
+
+    <section id="editor" class="card hide">
+      <div class="row between"><h3 id="editorTitle">Уреди</h3></div>
+      <div class="editor-grid">
+        <div class="editor-form">
+          <div id="fields" class="grid"></div>
+          <details class="adv"><summary>Напреден режим (JSON)</summary><textarea id="jsonBox"></textarea></details>
+          <div class="row"><button id="saveBtn">Зачувај</button><button id="cancelBtn" class="secondary">Откажи</button><span id="saveMsg" class="status muted"></span></div>
+        </div>
+        <aside class="editor-preview"><div id="editorPreview"></div></aside>
+      </div>
+    </section>
+
+    <div id="toolbar" class="toolbar hide"></div>
+    <section id="list"></section>
+  </main>
+</div>
+
+<div id="lightbox" class="lb hide"><img id="lbImg" src="" alt=""></div>
+
+<script>
+const cfg = window.APP_CONFIG || { MODE:'static', API_BASE_URL:'' };
+document.getElementById('mode').textContent = cfg.MODE || 'static';
+
+const DISCIPLINES = ['МСГ','ЖСГ','РГ','ТРА','АКРО','АЕ','ГЗА'];
+
+/* ---- per-type schema: fields (form) + view (preview) + filters ---- */
+const SCHEMA = {
+  settings: { label:'Почетна / контакт', hint:'Структурни поставки на насловната и контакт секции.', view:'settings', filters:[] },
+  news: { label:'Новости', view:'cards', filters:['year','category','branch'],
+    fields:[
+      {k:'title',label:'Наслов',type:'text',required:true},
+      {k:'slug',label:'Slug (URL)',type:'text',help:'пр. drzaven-prvenstvo-2026'},
+      {k:'date',label:'Датум',type:'date'},
+      {k:'category',label:'Категорија',type:'text',list:'cat'},
+      {k:'branch',label:'Дисциплина',type:'discipline'},
+      {k:'image',label:'Слика',type:'image'},
+      {k:'image_alt',label:'Алт текст на слика',type:'text'},
+      {k:'excerpt',label:'Краток опис (excerpt)',type:'textarea'},
+      {k:'body',label:'Содржина на статија',type:'richtext'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  events: { label:'Календар на натпревари', view:'table', filters:['year','branch','status','category'],
+    columns:'events',
+    fields:[
+      {k:'name',label:'Натпревар',type:'text',required:true},
+      {k:'slug',label:'Slug (URL)',type:'text'},
+      {k:'start_date',label:'Датум (од)',type:'date'},
+      {k:'end_date',label:'Датум (до)',type:'date'},
+      {k:'date_label',label:'Рачен приказ на датум',type:'text',help:'Опционо — ако е празно се форматира автоматски'},
+      {k:'branch',label:'Дисциплина',type:'discipline'},
+      {k:'category',label:'Категорија',type:'text',list:'cat'},
+      {k:'type',label:'Тип на натпревар',type:'text'},
+      {k:'location',label:'Локација',type:'text'},
+      {k:'organizer',label:'Организатор',type:'text'},
+      {k:'status',label:'Статус',type:'select',options:['','претстои','завршен','во тек','откажан'],help:'Празно = автоматски од датумот'},
+      {k:'description',label:'Опис',type:'textarea'},
+      {k:'bulletin',label:'Документи / Распис',type:'file'},
+      {k:'registration_url',label:'Линк за пријава',type:'url'},
+      {k:'results_url',label:'Линк до резултати',type:'url'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  results: { label:'Резултати', view:'table', filters:['year','branch','category'],
+    columns:'results',
+    fields:[
+      {k:'title',label:'Натпревар',type:'text',required:true},
+      {k:'date',label:'Датум',type:'date'},
+      {k:'branch',label:'Дисциплина',type:'discipline'},
+      {k:'category',label:'Категорија',type:'text',list:'cat'},
+      {k:'competition_type',label:'Тип на натпревар',type:'text'},
+      {k:'location',label:'Локација',type:'text'},
+      {k:'summary',label:'Краток опис',type:'textarea'},
+      {k:'file',label:'Резултати (PDF)',type:'file'},
+      {k:'results_url',label:'Резултати (линк)',type:'url'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  documents: { label:'Документи', view:'table', filters:['category','branch','year'],
+    columns:'documents',
+    fields:[
+      {k:'title',label:'Назив',type:'text',required:true},
+      {k:'category',label:'Категорија',type:'text',list:'cat'},
+      {k:'branch',label:'Дисциплина',type:'discipline'},
+      {k:'year',label:'Година',type:'number'},
+      {k:'description',label:'Опис',type:'textarea'},
+      {k:'route',label:'Рута / секција',type:'text'},
+      {k:'file',label:'Датотека за преземање',type:'file',required:true},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  gallery: { label:'Галерија', view:'gallery', filters:['year','category'],
+    fields:[
+      {k:'title',label:'Наслов',type:'text'},
+      {k:'date',label:'Датум',type:'date'},
+      {k:'category',label:'Категорија',type:'text',list:'cat'},
+      {k:'image',label:'Слика',type:'image',required:true},
+      {k:'image_alt',label:'Алт текст',type:'text'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  clubs: { label:'Клубови', view:'table', filters:['city'],
+    columns:'clubs',
+    fields:[
+      {k:'name',label:'Име на клуб',type:'text',required:true},
+      {k:'city',label:'Град',type:'text',list:'city'},
+      {k:'contact',label:'Контакт (тел. / е-пошта)',type:'text'},
+      {k:'website',label:'Веб-страница',type:'url'},
+      {k:'logo',label:'Лого',type:'image'},
+      {k:'description',label:'Опис',type:'textarea'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  people: { label:'Судии / Репрезентација / Тела', view:'profiles', filters:['group','branch'],
+    fields:[
+      {k:'name',label:'Име и презиме',type:'text',required:true},
+      {k:'role',label:'Функција / Улога',type:'text'},
+      {k:'group',label:'Група',type:'select',options:['','Судија','Репрезентација','Тело на федерацијата','Тренер','Стручен совет']},
+      {k:'branch',label:'Дисциплина',type:'discipline'},
+      {k:'license',label:'Лиценца',type:'text'},
+      {k:'image',label:'Фотографија',type:'image'},
+      {k:'body',label:'Биографија',type:'richtext'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  partners: { label:'Партнери', view:'partners', filters:[],
+    fields:[
+      {k:'name',label:'Име',type:'text',required:true},
+      {k:'url',label:'Веб-страница',type:'url'},
+      {k:'logo',label:'Лого',type:'image'},
+      {k:'featured',label:'Истакнато',type:'bool',default:false},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+  social: { label:'Социјални мрежи', view:'social', filters:[],
+    fields:[
+      {k:'platform',label:'Платформа',type:'text',required:true,help:'пр. Facebook, Instagram, YouTube'},
+      {k:'icon',label:'Икона',type:'select',options:['facebook','instagram','youtube','tiktok','x','linkedin','telegram','viber','web']},
+      {k:'url',label:'URL',type:'url',required:true},
+      {k:'active',label:'Активно',type:'bool',default:true},
+    ] },
+  pages: { label:'Страници', view:'pages', filters:[],
+    fields:[
+      {k:'title',label:'Наслов',type:'text',required:true},
+      {k:'slug',label:'Slug (URL)',type:'text',required:true},
+      {k:'body',label:'Содржина',type:'richtext'},
+      {k:'published',label:'Објавено',type:'bool',default:true},
+    ] },
+};
+
+const COLUMNS = {
+  events:[
+    {head:'Датум', cell:e=>fmtRange(e)},
+    {head:'Натпревар', cell:e=>`<b>${esc(e.name||e.title||'')}</b>${e.featured?' <span style="color:var(--warn)">★</span>':''}`},
+    {head:'Дисциплина', cell:e=>chip(e.branch)},
+    {head:'Локација', cell:e=>esc(e.location||'')||'—'},
+    {head:'Организатор', cell:e=>esc(e.organizer||'')||'—'},
+    {head:'Статус', cell:e=>statusBadge(e)},
+    {head:'Документи / Распис', cell:e=>linkCell(e.bulletin,'Распис')},
+    {head:'Пријава', cell:e=>linkCell(e.registration_url,'Пријава')},
+  ],
+  results:[
+    {head:'Датум', cell:r=>fmtDate(r.date)},
+    {head:'Натпревар', cell:r=>`<b>${esc(r.title||'')}</b>`},
+    {head:'Дисциплина', cell:r=>chip(r.branch)},
+    {head:'Категорија', cell:r=>chip(r.category)},
+    {head:'Резултати', cell:r=>twoLinks(linkCell(r.file,'PDF'), linkCell(r.results_url,'Линк'))},
+  ],
+  documents:[
+    {head:'Назив', cell:d=>`<b>${esc(d.title||'')}</b>${d.description?`<div class="muted sm">${esc(d.description)}</div>`:''}`},
+    {head:'Категорија', cell:d=>chip(d.category)},
+    {head:'Дисциплина', cell:d=>chip(d.branch)},
+    {head:'Година', cell:d=>esc(d.year||yearOfAny(d)||'')||'—'},
+    {head:'Преземи', cell:d=>linkCell(d.file,'Преземи')},
+  ],
+  clubs:[
+    {head:'', cell:c=>c.logo?`<img class="thumb" src="${esc(c.logo)}" alt="">`:'<div class="thumb ph"></div>'},
+    {head:'Клуб', cell:c=>`<b>${esc(c.name||'')}</b>`},
+    {head:'Град', cell:c=>esc(c.city||'')||'—'},
+    {head:'Контакт', cell:c=>esc(c.contact||'')||'—'},
+    {head:'Веб', cell:c=>linkCell(c.website,'Отвори')},
+  ],
+};
+
+/* ---- state ---- */
+let current='news', store={}, editing=null, working={}, filterState={}, currentFiltered=[];
+const $=id=>document.getElementById(id);
+
+/* ---- api (unchanged data contract) ---- */
+function api(name,qs=''){return (cfg.API_BASE_URL||'')+'/'+name+qs}
+async function auth(action,payload){const r=await fetch(api('auth',`?action=${action}`),{method:action==='session'?'GET':'POST',credentials:'include',headers:{'content-type':'application/json'},body:payload?JSON.stringify(payload):undefined});return r.json();}
+async function fetchContent(type){const base=cfg.CONTENT_BASE_URL||api('content');const sep=base.includes('?')?'&':'?';const r=await fetch(`${base}${sep}type=${type}`,{credentials:'include',cache:'no-store'});return r.json();}
+async function saveContent(type,method,body){const base=cfg.CONTENT_BASE_URL||api('content');const sep=base.includes('?')?'&':'?';const r=await fetch(`${base}${sep}type=${type}`,{method,credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify(body)});return r.json();}
+
+/* ---- helpers ---- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function clone(x){return JSON.parse(JSON.stringify(x))}
+function keyOf(x){return x.slug||x.id||x.title||x.name||x.date||''}
+function currentItems(){const p=store[current]||{};return Array.isArray(p.items)?p.items:[]}
+function parseDate(s){if(!s)return null;if(s instanceof Date)return s;const m=String(s).match(/(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);const d=new Date(s);return isNaN(d)?null:d;}
+function fmtDate(s){const d=parseDate(s);if(!d)return esc(s||'')||'—';return `${String(d.getDate()).padStart(2,'0')}.${String(d.getMonth()+1).padStart(2,'0')}.${d.getFullYear()}`;}
+function fmtRange(e){if(e.date_label)return esc(e.date_label);const s=e.start_date,en=e.end_date;if(s&&en&&s!==en)return fmtDate(s)+' – '+fmtDate(en);return fmtDate(s||e.date||en);}
+function yearFromVal(v){if(!v)return null;if(/^\d{4}$/.test(String(v)))return Number(v);const d=parseDate(v);return d?d.getFullYear():null;}
+function yearOfAny(x){return yearFromVal(x.start_date||x.date||x.end_date||x.year)}
+function eventDateObj(e){return parseDate(e.end_date)||parseDate(e.start_date)||parseDate(e.date)}
+function isPast(e){const st=String(e.status||'').toLowerCase();if(st==='завршен')return true;if(st==='претстои'||st==='во тек')return false;const d=eventDateObj(e);if(!d)return false;const t=new Date();t.setHours(0,0,0,0);return d<t;}
+function chip(v){return v?`<span class="chip">${esc(v)}</span>`:'<span class="muted">—</span>'}
+function statusBadge(e){const st=String(e.status||'').toLowerCase();if(st&&!['претстои','завршен'].includes(st))return `<span class="badge live">${esc(e.status)}</span>`;return isPast(e)?'<span class="badge past">Завршен</span>':'<span class="badge up">Претстои</span>';}
+function linkCell(url,label){return url?`<a class="linkbtn" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`:'—'}
+function twoLinks(a,b){const arr=[a,b].filter(x=>x&&x!=='—');return arr.length?arr.join(' '):'—'}
+function uniq(items,key){return [...new Set(items.map(x=>x[key]).filter(Boolean))]}
+function actionsCell(i){return `<div class="rowact"><button class="small secondary" data-edit data-i="${i}">Уреди</button><button class="small danger" data-del data-i="${i}">Избриши</button></div>`}
+function socialGlyph(s){const t=(s.platform||s.icon||'?').trim();return esc(t.slice(0,2))}
+
+/* ---- load + render ---- */
+async function load(type=current){current=type;try{store[type]=await fetchContent(type)}catch(e){store[type]=type==='settings'?{}:{items:[]}}$('editor').classList.add('hide');render();}
+function renderTabs(){const t=$('tabs');t.innerHTML=Object.entries(SCHEMA).map(([k,v])=>`<button class="${k===current?'active':''}" data-t="${k}">${esc(v.label)}</button>`).join('');t.querySelectorAll('button').forEach(b=>b.onclick=()=>load(b.dataset.t));}
+
+function render(){
+  renderTabs();
+  const S=SCHEMA[current];
+  $('title').textContent=S.label;
+  $('newBtn').style.display=current==='settings'?'none':'';
+  if(current==='settings'){$('hint').textContent=S.hint||'';$('toolbar').classList.add('hide');renderSettings(store.settings||{});return;}
+  const items=currentItems();
+  renderFilters(current,items);
+  const filtered=applyFilters(current,items);
+  currentFiltered=filtered;
+  $('hint').textContent=`${filtered.length} од ${items.length} ставки`;
+  const view=S.view, L=$('list');
+  if(view==='cards')L.innerHTML=viewCards(filtered);
+  else if(view==='table')L.innerHTML=viewTable(current,filtered);
+  else if(view==='gallery')L.innerHTML=viewGallery(filtered);
+  else if(view==='profiles')L.innerHTML=viewProfiles(filtered);
+  else if(view==='partners')L.innerHTML=viewPartners(filtered);
+  else if(view==='social')L.innerHTML=viewSocial(filtered);
+  else L.innerHTML=viewPages(filtered);
+  bindRowActions();
+}
+
+/* ---- filters ---- */
+function getFilter(type){return filterState[type]||(filterState[type]={})}
+function selectFilter(fk,all,opts,val){const o=opts.map(o=>Array.isArray(o)?o:[o,o]).map(([v,l])=>`<option value="${esc(v)}" ${String(val||'')===String(v)?'selected':''}>${esc(l)}</option>`).join('');return `<select data-fk="${fk}"><option value="">${esc(all)}</option>${o}</select>`}
+function renderFilters(type,items){
+  const defs=SCHEMA[type].filters||[],T=$('toolbar');
+  if(!defs.length){T.innerHTML='';T.classList.add('hide');return;}
+  T.classList.remove('hide');
+  const st=getFilter(type),parts=[];
+  defs.forEach(d=>{
+    if(d==='year')parts.push(selectFilter('year','Сите години',[...new Set(items.map(yearOfAny).filter(Boolean))].sort((a,b)=>b-a),st.year));
+    else if(d==='category')parts.push(selectFilter('category','Сите категории',uniq(items,'category'),st.category));
+    else if(d==='branch')parts.push(selectFilter('branch','Сите дисциплини',uniq(items,'branch'),st.branch));
+    else if(d==='city')parts.push(selectFilter('city','Сите градови',uniq(items,'city'),st.city));
+    else if(d==='group')parts.push(selectFilter('group','Сите групи',uniq(items,'group'),st.group));
+    else if(d==='status')parts.push(selectFilter('status','Сите статуси',[['up','Претстои'],['past','Завршен']],st.status));
+  });
+  parts.push(`<button class="small secondary" id="clearFilters">Исчисти</button>`);
+  T.innerHTML=parts.join('');
+  T.querySelectorAll('select').forEach(s=>s.onchange=()=>{st[s.dataset.fk]=s.value;render();});
+  $('clearFilters').onclick=()=>{filterState[type]={};render();};
+}
+function applyFilters(type,items){
+  const st=getFilter(type);let r=items;
+  if(st.year)r=r.filter(x=>String(yearOfAny(x))===String(st.year));
+  if(st.category)r=r.filter(x=>(x.category||'')===st.category);
+  if(st.branch)r=r.filter(x=>(x.branch||'')===st.branch);
+  if(st.city)r=r.filter(x=>(x.city||'')===st.city);
+  if(st.group)r=r.filter(x=>(x.group||'')===st.group);
+  if(st.status)r=r.filter(x=>st.status==='past'?isPast(x):!isPast(x));
+  return r;
+}
+
+/* ---- grouping ---- */
+function eventGroups(items){
+  const up=items.filter(e=>!isPast(e)).sort((a,b)=>(eventDateObj(a)?.getTime()||Infinity)-(eventDateObj(b)?.getTime()||Infinity));
+  const past=items.filter(isPast),byYear={};
+  past.forEach(e=>{const y=yearOfAny(e)||'Без датум';(byYear[y]=byYear[y]||[]).push(e)});
+  const groups=[];
+  if(up.length)groups.push({title:'Претстојни натпревари',items:up,kind:'up'});
+  Object.keys(byYear).sort((a,b)=>a==='Без датум'?1:b==='Без датум'?-1:Number(b)-Number(a))
+    .forEach(y=>groups.push({title:'Архива '+y,items:byYear[y].sort((p,q)=>(eventDateObj(q)?.getTime()||0)-(eventDateObj(p)?.getTime()||0))}));
+  return groups;
+}
+function yearGroups(items,dateFn){
+  const map={};
+  items.forEach(it=>{const y=yearFromVal(dateFn(it))||'Без датум';(map[y]=map[y]||[]).push(it)});
+  return Object.keys(map).sort((a,b)=>a==='Без датум'?1:b==='Без датум'?-1:Number(b)-Number(a))
+    .map(y=>({title:String(y),items:map[y].sort((p,q)=>(parseDate(dateFn(q))?.getTime()||0)-(parseDate(dateFn(p))?.getTime()||0))}));
+}
+
+/* ---- views ---- */
+function viewTable(type,items){
+  if(!items.length)return '<p class="muted">Нема ставки.</p>';
+  const cols=COLUMNS[type],idxOf=new Map(items.map((x,i)=>[x,i]));
+  let groups;
+  if(type==='events')groups=eventGroups(items);
+  else if(type==='results')groups=yearGroups(items,r=>r.date);
+  else if(type==='documents')groups=yearGroups(items,d=>d.year||d.date);
+  else groups=[{title:null,items}];
+  return groups.map(g=>`
+    ${g.title?`<div class="group-title">${esc(g.title)}${g.kind==='up'?` <span class="badge up">${g.items.length}</span>`:''}</div>`:''}
+    <div class="tblwrap"><table class="tbl"><thead><tr>${cols.map(c=>`<th>${c.head}</th>`).join('')}<th></th></tr></thead>
+    <tbody>${g.items.map(it=>`<tr>${cols.map(c=>`<td>${c.cell(it)}</td>`).join('')}<td class="act">${actionsCell(idxOf.get(it))}</td></tr>`).join('')}</tbody></table></div>`).join('');
+}
+function viewCards(items){
+  if(!items.length)return '<p class="muted">Нема новости.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return `<div class="news-grid">${[...items].sort((a,b)=>(parseDate(b.date)?.getTime()||0)-(parseDate(a.date)?.getTime()||0)).map(n=>`
+    <article class="news-card ${n.published===false?'unpub':''}">
+      <div class="news-thumb">${n.image?`<img src="${esc(n.image)}" alt="${esc(n.image_alt||'')}">`:'<div class="ph"></div>'}${n.featured?'<span class="star">★</span>':''}</div>
+      <div class="news-body">
+        <div class="news-meta"><span>${fmtDate(n.date)}</span>${n.category?`<span class="chip">${esc(n.category)}</span>`:''}</div>
+        <h4>${esc(n.title||'')}</h4><p class="muted">${esc(n.excerpt||'')}</p>
+        <div class="row between"><span class="readmore">Прочитај повеќе →</span>${actionsCell(idxOf.get(n))}</div>
+      </div></article>`).join('')}</div>`;
+}
+function viewGallery(items){
+  if(!items.length)return '<p class="muted">Нема слики.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return `<div class="gal">${[...items].sort((a,b)=>(parseDate(b.date)?.getTime()||0)-(parseDate(a.date)?.getTime()||0)).map(g=>`
+    <figure class="gal-item ${g.published===false?'unpub':''}">
+      ${g.image?`<img src="${esc(g.image)}" alt="${esc(g.image_alt||g.title||'')}" data-full="${esc(g.image)}">`:'<div class="ph"></div>'}${g.featured?'<span class="star">★</span>':''}
+      <figcaption><b>${esc(g.title||'')}</b><span class="muted">${[fmtDate(g.date),esc(g.category||'')].filter(x=>x&&x!=='—').join(' · ')}</span></figcaption>
+      <div class="gal-act">${actionsCell(idxOf.get(g))}</div></figure>`).join('')}</div>`;
+}
+function viewProfiles(items){
+  if(!items.length)return '<p class="muted">Нема профили.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return `<div class="people-grid">${items.map(p=>`
+    <article class="profile ${p.published===false?'unpub':''}">
+      <div class="avatar">${p.image?`<img src="${esc(p.image)}" alt="">`:`<span>${esc((p.name||'?').trim().slice(0,1))}</span>`}</div>
+      <h4>${esc(p.name||'')}</h4><div class="role">${esc(p.role||'')}</div>
+      <div class="row center gap6">${p.group?`<span class="chip">${esc(p.group)}</span>`:''}${p.branch?`<span class="chip">${esc(p.branch)}</span>`:''}${p.license?`<span class="chip lic">Лиценца: ${esc(p.license)}</span>`:''}</div>
+      <p class="muted bio">${esc(p.body||'')}</p>${actionsCell(idxOf.get(p))}</article>`).join('')}</div>`;
+}
+function viewPartners(items){
+  if(!items.length)return '<p class="muted">Нема партнери.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return `<div class="partner-grid">${items.map(p=>`
+    <article class="partner ${p.published===false?'unpub':''}">
+      <a class="partner-logo" href="${esc(p.url||'#')}" target="_blank" rel="noopener">${p.logo?`<img src="${esc(p.logo)}" alt="${esc(p.name||'')}">`:esc(p.name||'')}</a>
+      <div class="row between"><b>${esc(p.name||'')}</b></div>${actionsCell(idxOf.get(p))}</article>`).join('')}</div>`;
+}
+function viewSocial(items){
+  if(!items.length)return '<p class="muted">Нема социјални мрежи.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return `<div class="social-list">${items.map(s=>{const active=s.active!==false&&s.published!==false;return `
+    <div class="social-row ${active?'':'off'}"><span class="social-icon">${socialGlyph(s)}</span>
+      <div class="social-main"><b>${esc(s.platform||'')}</b><a href="${esc(s.url||'#')}" target="_blank" rel="noopener" class="muted">${esc(s.url||'')}</a></div>
+      <span class="badge ${active?'up':'past'}">${active?'Активно':'Неактивно'}</span>${actionsCell(idxOf.get(s))}</div>`}).join('')}</div>`;
+}
+function viewPages(items){
+  if(!items.length)return '<p class="muted">Нема страници.</p>';
+  const idxOf=new Map(items.map((x,i)=>[x,i]));
+  return items.map(p=>`<article class="item ${p.published===false?'unpub':''}"><div class="row between"><div><b>${esc(p.title||p.slug||'')}</b><div class="muted sm">/${esc(p.slug||'')}</div></div>${actionsCell(idxOf.get(p))}</div></article>`).join('');
+}
+
+/* ---- single-item preview (editor) ---- */
+function previewOne(type,x){
+  switch(type){
+    case 'news':return `<article class="news-card"><div class="news-thumb">${x.image?`<img src="${esc(x.image)}" alt="">`:'<div class="ph"></div>'}${x.featured?'<span class="star">★</span>':''}</div><div class="news-body"><div class="news-meta"><span>${fmtDate(x.date)}</span>${x.category?`<span class="chip">${esc(x.category)}</span>`:''}</div><h4>${esc(x.title||'')}</h4><p class="muted">${esc(x.excerpt||'')}</p><span class="readmore">Прочитај повеќе →</span></div></article>`;
+    case 'events':return `<div class="card" style="margin:0"><div class="row between"><b>${esc(x.name||'')}</b>${statusBadge(x)}</div><div class="muted sm" style="margin:6px 0">${fmtRange(x)} · ${esc(x.location||'')}</div><div class="row gap6">${chip(x.branch)}${chip(x.category)}</div><div class="row gap6" style="margin-top:10px">${linkCell(x.bulletin,'Распис')} ${linkCell(x.registration_url,'Пријава')}</div></div>`;
+    case 'results':return `<div class="card" style="margin:0"><b>${esc(x.title||'')}</b><div class="muted sm" style="margin:6px 0">${fmtDate(x.date)} · ${esc(x.location||'')}</div><div class="row gap6">${chip(x.branch)}${chip(x.category)}</div><div style="margin-top:10px">${twoLinks(linkCell(x.file,'PDF'),linkCell(x.results_url,'Линк'))}</div></div>`;
+    case 'documents':return `<div class="card" style="margin:0"><b>${esc(x.title||'')}</b>${x.description?`<div class="muted sm">${esc(x.description)}</div>`:''}<div class="row gap6" style="margin:8px 0">${chip(x.category)}${chip(x.branch)}${x.year?`<span class="chip">${esc(x.year)}</span>`:''}</div>${linkCell(x.file,'Преземи')}</div>`;
+    case 'gallery':return `<figure class="gal-item" style="max-width:220px">${x.image?`<img src="${esc(x.image)}" alt="">`:'<div class="ph"></div>'}<figcaption><b>${esc(x.title||'')}</b><span class="muted">${[fmtDate(x.date),esc(x.category||'')].filter(v=>v&&v!=='—').join(' · ')}</span></figcaption></figure>`;
+    case 'clubs':return `<div class="card" style="margin:0"><div class="row gap6">${x.logo?`<img class="thumb" src="${esc(x.logo)}" alt="">`:'<div class="thumb ph"></div>'}<b>${esc(x.name||'')}</b></div><div class="muted sm" style="margin:8px 0">${esc(x.city||'')}${x.contact?' · '+esc(x.contact):''}</div>${linkCell(x.website,'Веб-страница')}</div>`;
+    case 'people':return `<article class="profile" style="max-width:240px;margin:auto"><div class="avatar">${x.image?`<img src="${esc(x.image)}" alt="">`:`<span>${esc((x.name||'?').trim().slice(0,1))}</span>`}</div><h4>${esc(x.name||'')}</h4><div class="role">${esc(x.role||'')}</div><div class="row center gap6">${x.group?`<span class="chip">${esc(x.group)}</span>`:''}${x.branch?`<span class="chip">${esc(x.branch)}</span>`:''}${x.license?`<span class="chip lic">${esc(x.license)}</span>`:''}</div><p class="muted bio">${esc(x.body||'')}</p></article>`;
+    case 'partners':return `<article class="partner"><span class="partner-logo">${x.logo?`<img src="${esc(x.logo)}" alt="">`:esc(x.name||'')}</span><b>${esc(x.name||'')}</b></article>`;
+    case 'social':{const a=x.active!==false&&x.published!==false;return `<div class="social-row ${a?'':'off'}"><span class="social-icon">${socialGlyph(x)}</span><div class="social-main"><b>${esc(x.platform||'')}</b><span class="muted">${esc(x.url||'')}</span></div><span class="badge ${a?'up':'past'}">${a?'Активно':'Неактивно'}</span></div>`}
+    case 'pages':return `<div class="card" style="margin:0"><b>${esc(x.title||'')}</b><div class="muted sm">/${esc(x.slug||'')}</div></div>`;
+    default:return '';
+  }
+}
+
+/* ---- editor ---- */
+function defaultItem(type){const o={};(SCHEMA[type].fields||[]).forEach(f=>{if(f.type==='bool')o[f.k]=f.default??false});return o;}
+function datalists(type){
+  const items=currentItems();
+  const branch=[...new Set([...DISCIPLINES,...items.map(x=>x.branch).filter(Boolean)])];
+  const cat=uniq(items,'category'),city=uniq(items,'city');
+  return `<datalist id="dl_branch">${branch.map(v=>`<option value="${esc(v)}">`).join('')}</datalist>`+
+         `<datalist id="dl_cat">${cat.map(v=>`<option value="${esc(v)}">`).join('')}</datalist>`+
+         `<datalist id="dl_city">${city.map(v=>`<option value="${esc(v)}">`).join('')}</datalist>`;
+}
+function inputFor(f,v){
+  const id='f_'+f.k,c=`data-f="${f.k}" data-type="${f.type}" id="${id}"`;let inner;
+  switch(f.type){
+    case 'textarea':inner=`<textarea ${c}>${esc(v??'')}</textarea>`;break;
+    case 'richtext':inner=`<textarea ${c} class="rich">${esc(v??'')}</textarea>`;break;
+    case 'date':inner=`<input type="date" ${c} value="${esc(v??'')}">`;break;
+    case 'number':inner=`<input type="number" ${c} value="${esc(v??'')}">`;break;
+    case 'url':inner=`<input type="url" ${c} value="${esc(v??'')}" placeholder="https://...">`;break;
+    case 'bool':inner=`<label class="toggle"><input type="checkbox" ${c} ${v?'checked':''}><span></span></label>`;break;
+    case 'select':inner=`<select ${c}>${(f.options||[]).map(o=>`<option value="${esc(o)}" ${String(v||'')===o?'selected':''}>${esc(o||'—')}</option>`).join('')}</select>`;break;
+    case 'discipline':inner=`<input ${c} list="dl_branch" value="${esc(v??'')}" placeholder="МСГ, ЖСГ, РГ...">`;break;
+    case 'image':case 'file':inner=uplField(f,v);break;
+    default:inner=`<input ${c} value="${esc(v??'')}" ${f.list?`list="dl_${f.list}"`:''} placeholder="${esc(f.ph||'')}">`;
+  }
+  const wide=['textarea','richtext','image','file'].includes(f.type)||f.wide;
+  return `<div class="field ${wide?'wide':''}"><label for="${id}">${esc(f.label)}${f.required?' <span class="req">*</span>':''}</label>${inner}${f.help?`<div class="fhelp">${esc(f.help)}</div>`:''}</div>`;
+}
+function uplField(f,v){
+  const accept=f.type==='image'?'image/*':'';
+  return `<div class="upl"><div class="upl-row"><input data-f="${f.k}" data-type="${f.type}" id="f_${f.k}" value="${esc(v??'')}" placeholder="/assets/uploads/...">`+
+    `<label class="btn secondary small uplbtn">Прикачи<input type="file" accept="${accept}" data-upl="${f.k}" hidden></label></div>`+
+    `<div class="thumb-prev" data-prev="${f.k}">${v&&f.type==='image'?`<img src="${esc(v)}" alt="">`:''}</div></div>`;
+}
+function typedVal(el){if(el.type==='checkbox')return el.checked;if(el.dataset.type==='number')return el.value===''?'':Number(el.value);if(el.dataset.type==='json'){try{return JSON.parse(el.value)}catch{return el.value}}return el.value;}
+
+function openEditor(key){
+  editing=key;$('editor').classList.remove('hide');
+  const isSettings=current==='settings';
+  const orig=(!isSettings&&key!=null)?currentItems().find(x=>keyOf(x)===key):null;
+  working=isSettings?clone(store.settings||{}):(orig?clone(orig):defaultItem(current));
+  $('editorTitle').textContent=isSettings?'Поставки на почетна / контакт':(orig?'Уреди: '+SCHEMA[current].label:'Нова ставка: '+SCHEMA[current].label);
+  $('fields').innerHTML=(isSettings?settingsForm(working):SCHEMA[current].fields.map(f=>inputFor(f,working[f.k])).join('')+datalists(current));
+  $('jsonBox').value=JSON.stringify(working,null,2);
+  bindFormInputs();renderEditorPreview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function bindFormInputs(){
+  $('fields').querySelectorAll('[data-f]').forEach(el=>{
+    const ev=(el.type==='checkbox'||el.tagName==='SELECT')?'change':'input';
+    el.addEventListener(ev,()=>{
+      if(el.dataset.f==='__all__'){try{working=JSON.parse(el.value)}catch{}}
+      else working[el.dataset.f]=typedVal(el);
+      $('jsonBox').value=JSON.stringify(working,null,2);
+      const prev=$('fields').querySelector(`[data-prev="${el.dataset.f}"]`);
+      if(prev&&el.dataset.type==='image')prev.innerHTML=el.value?`<img src="${esc(el.value)}" alt="">`:'';
+      renderEditorPreview();
+    });
+  });
+  $('fields').querySelectorAll('[data-upl]').forEach(inp=>inp.addEventListener('change',async()=>{
+    const file=inp.files[0];if(!file)return;$('saveMsg').textContent='Се прикачува...';
+    const path=await uploadFile(file);
+    if(!path){$('saveMsg').textContent='Грешка при прикачување';return;}
+    const k=inp.dataset.upl;working[k]=path;
+    const t=$('fields').querySelector(`input[data-f="${k}"]`);if(t)t.value=path;
+    const prev=$('fields').querySelector(`[data-prev="${k}"]`);if(prev&&t&&t.dataset.type==='image')prev.innerHTML=`<img src="${esc(path)}" alt="">`;
+    $('jsonBox').value=JSON.stringify(working,null,2);renderEditorPreview();$('saveMsg').textContent='Прикачено: '+path;
+  }));
+  $('jsonBox').oninput=()=>{try{working=JSON.parse($('jsonBox').value);renderEditorPreview();$('saveMsg').textContent=''}catch{$('saveMsg').textContent='JSON во тек...'}};
+}
+function renderEditorPreview(){const p=$('editorPreview');if(current==='settings'){p.innerHTML='<div class="prev-label">Структурни поставки</div><p class="muted sm">Уреди ги полињата лево. Секое е JSON секција.</p>';return;}p.innerHTML='<div class="prev-label">Преглед</div>'+previewOne(current,working);}
+
+/* ---- settings ---- */
+function settingsForm(obj){
+  const keys=Object.keys(obj);
+  if(!keys.length)return `<div class="field wide"><label for="f___all__">Поставки (JSON)</label><textarea data-f="__all__" data-type="json" id="f___all__" class="rich">${esc(JSON.stringify(obj,null,2))}</textarea></div>`;
+  return keys.map(k=>`<div class="field wide"><label for="f_${esc(k)}">${esc(k)}</label><textarea data-f="${esc(k)}" data-type="json" id="f_${esc(k)}" class="rich">${esc(JSON.stringify(obj[k],null,2))}</textarea></div>`).join('');
+}
+function renderSettings(payload){
+  const keys=Object.keys(payload||{});
+  $('list').innerHTML=`<div class="card"><div class="row between"><div><b>Структурни поставки</b><div class="muted sm">hero, featured, calendar, news, goals, contact</div></div><button class="small" id="editSettings">Уреди поставки</button></div>
+    <div class="settings-keys">${keys.map(k=>`<div class="skey"><b>${esc(k)}</b><pre class="muted">${esc(JSON.stringify(payload[k]).slice(0,140))}…</pre></div>`).join('')||'<p class="muted">Нема поставки.</p>'}</div></div>`;
+  $('editSettings').onclick=()=>openEditor(null);
+}
+
+/* ---- save / delete / upload ---- */
+async function save(){
+  $('saveMsg').textContent='Се зачувува...';
+  let item;try{item=JSON.parse($('jsonBox').value)}catch(e){$('saveMsg').textContent='JSON грешка: '+e.message;return;}
+  let res;
+  if(current==='settings')res=await saveContent('settings','PUT',{payload:item});
+  else res=await saveContent(current,editing!=null?'PATCH':'POST',editing!=null?{key:editing,item}:{item});
+  if(!res||!res.ok){$('saveMsg').textContent=(res&&res.error)||'Грешка';return;}
+  $('editor').classList.add('hide');await load(current);
+}
+async function delItem(key){if(!confirm('Избриши ја ставката?'))return;await saveContent(current,'DELETE',{key});await load(current);}
+async function uploadFile(f){
+  if(cfg.MODE==='zemi'){const fd=new FormData();fd.append('file',f);const r=await fetch(cfg.UPLOAD_URL,{method:'POST',credentials:'include',body:fd});const j=await r.json();return j.path||null;}
+  const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f)});
+  const r=await fetch(cfg.UPLOAD_URL,{method:'POST',credentials:'include',headers:{'content-type':'application/json'},body:JSON.stringify({filename:f.name,content:b64})});
+  const j=await r.json();return j.path||null;
+}
+
+/* ---- bind list actions ---- */
+function bindRowActions(){
+  $('list').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEditor(keyOf(currentFiltered[+b.dataset.i])));
+  $('list').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>delItem(keyOf(currentFiltered[+b.dataset.i])));
+  $('list').querySelectorAll('[data-full]').forEach(im=>im.onclick=()=>{$('lbImg').src=im.dataset.full;$('lightbox').classList.remove('hide');});
+}
+$('lightbox').onclick=()=>$('lightbox').classList.add('hide');
+
+/* ---- top-level buttons ---- */
+$('newBtn').onclick=()=>{if(current!=='settings')openEditor(null)};
+$('cancelBtn').onclick=()=>$('editor').classList.add('hide');
+$('saveBtn').onclick=save;
+$('uploadBtn').onclick=async()=>{const f=$('file').files[0];if(!f)return;$('uploadPath').value='...';const p=await uploadFile(f);$('uploadPath').value=p||'грешка';};
+
+/* ---- auth flow ---- */
+$('loginBtn').onclick=async()=>{$('loginMsg').textContent='...';const r=await auth('login',{password:$('password').value});if(r.ok)start();else $('loginMsg').textContent=r.error||'Грешка';};
+$('logout').onclick=async()=>{await auth('logout');location.reload();};
+async function start(){$('login').classList.add('hide');$('app').classList.remove('hide');$('logout').classList.remove('hide');await load('news');}
+(async()=>{try{const s=await auth('session');if(s.authenticated)start();}catch(e){$('loginMsg').textContent='Backend не е достапен: '+e.message;}})();
+</script>
+</body>
+</html>
